@@ -1,4 +1,4 @@
-package com.example.roomnameapp
+package com.example.eac23
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,12 +15,11 @@ import androidx.room.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 // 1. Defineix l'entitat User
 @Entity(tableName = "users")
 data class User(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0, // Se autogenera el ID
+    @PrimaryKey val id: Int = 0,
     val name: String
 )
 
@@ -63,15 +62,13 @@ class MainActivity : ComponentActivity() {
     fun UserNameScreen() {
         var userName by remember { mutableStateOf(TextFieldValue("Escriu el teu nom")) }
 
-        // Carrega el nom emmagatzemat al iniciar
         LaunchedEffect(Unit) {
-            CoroutineScope(Dispatchers.IO).launch {
-                val user = db.userDao().getUser()
-                withContext(Dispatchers.Main) {
-                    if (user != null) {
-                        userName = TextFieldValue(user.name)
-                    }
-                }
+            // Carrega el nom emmagatzemat al iniciar
+            val user = db.userDao().getUser()
+            userName = if (user != null) {
+                TextFieldValue(user.name)
+            } else {
+                TextFieldValue("Escriu el teu nom")
             }
         }
 
